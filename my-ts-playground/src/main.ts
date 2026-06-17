@@ -7,8 +7,6 @@ let stepSize: number = 1;
 
 const app = document.querySelector("#app");
 
-let lsClicks = localStorage.getItem("clicks");
-
 function increase(): void {
 	const maybeInput = document.getElementById("step-size") as HTMLInputElement;
 	const maybeStepSize = Number(maybeInput?.value);
