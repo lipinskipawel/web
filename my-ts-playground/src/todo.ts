@@ -1,5 +1,7 @@
 
 const todo = document.getElementById("todo");
+let todoCounter: number = Number(localStorage.getItem("todoCounter"));
+let hideShowToggle: boolean = false;
 
 interface Todo {
 	id: number,
@@ -15,17 +17,19 @@ function deleteTasks(): void {
 		let childrens = listDiv.childNodes;
 		for (let node of childrens) {
 			let checkbox = node.firstChild as HTMLInputElement;
+			if (!checkbox.checked) {
+				continue;
+			}
 			let rawId = checkbox.id.replace("-inner-list", "");
 			if (checkbox.checked) {
 				let found = todos
-					.filter(it => it.completed === false)
 					.find(it => it.id === Number(rawId));
 				if (found) {
 					todos.splice(found?.id, 1);
 				}
 			}
 		}
-		renderList();
+		renderList(hideShowToggle);
 	}
 }
 
@@ -35,29 +39,50 @@ function completeTasks(): void {
 		let childrens = listDiv.childNodes;
 		for (let child of childrens) {
 			let checkbox = child.firstChild as HTMLInputElement;
+			if (!checkbox.checked) {
+				continue;
+			}
 			let rawId = checkbox.id.replace("-inner-list", "");
 			let current = todos.find(it => it.id === Number(rawId));
 			if (current) {
 				current.completed = checkbox.checked;
 			}
 		}
-		renderList();
+		renderList(hideShowToggle);
 	}
+}
+
+function hideShow(): void {
+	hideShowToggle = !hideShowToggle;
+	renderList(hideShowToggle);
 }
 
 function taskReader(event: KeyboardEvent): void {
 	if (event.key == "Enter" && event.target instanceof HTMLInputElement) {
 		todos.push({
-			id: todos.length,
+			id: todoCounter++,
 			task: event.target.value,
 			completed: false
 		} as Todo);
 		event.target.value = "";
-		renderList();
+		renderList(hideShowToggle);
 	}
 }
 
-function renderList(): void {
+function saveLoadLocalStorage(): void {
+	if (todos.length !== 0) {
+		localStorage.setItem("todos", JSON.stringify(todos));
+		localStorage.setItem("todoCounter", String(todoCounter));
+	} else {
+		let maybeTodos = localStorage.getItem("todos");
+		if (maybeTodos) {
+			todos = JSON.parse(maybeTodos);
+		}
+	}
+	renderList(hideShowToggle);
+}
+
+function renderList(hideCompleted: boolean): void {
 	const listDiv = document.getElementById("list-div");
 	while (listDiv?.firstChild) {
 		listDiv.removeChild(listDiv.firstChild);
@@ -68,7 +93,7 @@ function renderList(): void {
 			const checkbox = Object.assign(document.createElement("input"), {
 				id: `${todo.id}-inner-list`,
 				type: 'checkbox',
-				checked: todo.completed
+				checked: false
 			}) as HTMLInputElement;
 			const label = Object.assign(document.createElement("label"), {
 				htmlFor: `${todo.id}-inner-list`,
@@ -76,18 +101,24 @@ function renderList(): void {
 			}) as HTMLLabelElement;
 
 
-			const wrapperDiv = document.createElement("div");
-			wrapperDiv.appendChild(checkbox);
-			if (todo.completed) {
-				const s = document.createElement("s");
-				s.appendChild(label);
-				wrapperDiv.appendChild(s);
-			} else {
-				wrapperDiv.appendChild(label);
+			if (drawTodo(todo, hideCompleted)) {
+				const wrapperDiv = document.createElement("div");
+				wrapperDiv.appendChild(checkbox);
+				if (todo.completed) {
+					const s = document.createElement("s");
+					s.appendChild(label);
+					wrapperDiv.appendChild(s);
+				} else {
+					wrapperDiv.appendChild(label);
+				}
+				listDiv.appendChild(wrapperDiv);
 			}
-			listDiv.appendChild(wrapperDiv);
 		}
 	}
+}
+
+function drawTodo(todo: Todo, toggle: boolean): boolean {
+	return toggle == false || !todo.completed;
 }
 
 if (todo) {
@@ -95,15 +126,19 @@ if (todo) {
 		<h1>Hello inside the TODO app</h1>
 		<div>Add you new tasks</div>
 		<input type="text" id="task-input"/>
+		<button id="save-load-ls">Save or load from local storage</button>
 		<button id="delete">Delete checked tasks</button>
 		<button id="complete">Complete checked tasks</button>
+		<button id="hide-show">Hide/Show completed tasks</button>
 		<span></span>
 		<div id="list-div"></div>
 	`;
 
-	renderList();
+	renderList(hideShowToggle);
+	document.getElementById("save-load-ls")?.addEventListener("click", saveLoadLocalStorage);
 	document.getElementById("delete")?.addEventListener("click", deleteTasks);
 	document.getElementById("complete")?.addEventListener("click", completeTasks);
+	document.getElementById("hide-show")?.addEventListener("click", hideShow);
 	document.getElementById("task-input")?.addEventListener("keypress", (event) => {
 		taskReader(event);
 	});
