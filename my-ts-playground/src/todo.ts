@@ -1,3 +1,4 @@
+import "./todo.css";
 
 const todo = document.getElementById("todo");
 let todoCounter: number = Number(localStorage.getItem("todoCounter"));
@@ -34,18 +35,20 @@ function deleteTasks(): void {
 }
 
 function completeTasks(): void {
-	const listDiv = document.getElementById("list-div");
+	const listDiv = document.getElementById("list-div") as HTMLDivElement;
 	if (listDiv) {
-		let childrens = listDiv.childNodes;
+		let childrens = listDiv.children;
 		for (let child of childrens) {
-			let checkbox = child.firstChild as HTMLInputElement;
-			if (!checkbox.checked) {
-				continue;
-			}
-			let rawId = checkbox.id.replace("-inner-list", "");
-			let current = todos.find(it => it.id === Number(rawId));
-			if (current) {
-				current.completed = checkbox.checked;
+			let checkbox = child.querySelector<HTMLInputElement>("input");
+			if (checkbox) {
+				if (!checkbox.checked) {
+					continue;
+				}
+				let rawId = checkbox.id.replace("-inner-list", "");
+				let current = todos.find(it => it.id === Number(rawId));
+				if (current) {
+					current.completed = !current.completed;
+				}
 			}
 		}
 		renderList(hideShowToggle);
@@ -88,6 +91,9 @@ function renderList(hideCompleted: boolean): void {
 		listDiv.removeChild(listDiv.firstChild);
 	}
 	if (listDiv) {
+		// let is better over the var when using closure, because 'let' creates
+		// fresh bindings per iteration, whereas 'var' would share one variable
+		// across every iteration, so every closure would see last value
 		for (let todo of todos) {
 			console.log(`What is idx: ${JSON.stringify(todo, null, 4)}`);
 			const checkbox = Object.assign(document.createElement("input"), {
@@ -96,22 +102,21 @@ function renderList(hideCompleted: boolean): void {
 				checked: false
 			}) as HTMLInputElement;
 			const label = Object.assign(document.createElement("label"), {
-				htmlFor: `${todo.id}-inner-list`,
+				// This is optional to comment it out when using dblclick as a event
+				//htmlFor: `${todo.id}-inner-list`,
+				id: `${todo.id}-inner-label`,
 				textContent: `${todo.task}`
 			}) as HTMLLabelElement;
-
 
 			if (drawTodo(todo, hideCompleted)) {
 				const wrapperDiv = document.createElement("div");
 				wrapperDiv.appendChild(checkbox);
 				if (todo.completed) {
-					const s = document.createElement("s");
-					s.appendChild(label);
-					wrapperDiv.appendChild(s);
-				} else {
-					wrapperDiv.appendChild(label);
+					label.classList.toggle("complete");
 				}
+				wrapperDiv.appendChild(label);
 				listDiv.appendChild(wrapperDiv);
+				label.addEventListener("dblclick", () => startEditing(todo, label, wrapperDiv));
 			}
 		}
 	}
@@ -119,6 +124,43 @@ function renderList(hideCompleted: boolean): void {
 
 function drawTodo(todo: Todo, toggle: boolean): boolean {
 	return toggle == false || !todo.completed;
+}
+
+function startEditing(todo: Todo, label: HTMLLabelElement, div: HTMLDivElement): void {
+	if (todo.completed) {
+		return;
+	}
+    // 1. Create a temporary input pre-filled with current task text
+    const editInput = document.createElement("input");
+	// TypeScript already ships overloaded signatures for createElement method
+	// so we can access properties by '.'
+    editInput.type = "text";
+    editInput.value = todo.task;
+
+    // 2. Hide the label, insert the input in its place
+	label.classList.toggle("hidden");
+    div.insertBefore(editInput, label);
+    editInput.focus();
+
+    // 3. Helper to finish editing
+    function finishEditing(): void {
+        const newText = editInput.value.trim();
+        if (newText && newText !== todo.task) {
+            todo.task = newText;          // update the data
+        }
+        editInput.remove();               // remove the temporary input
+        label.textContent = todo.task;    // update label text
+        label.classList.toggle("hidden");         // show label again
+    }
+
+    // 4. Commit on Enter, cancel on Escape
+    editInput.addEventListener("keydown", (e: KeyboardEvent) => {
+        if (e.key === "Enter")  finishEditing();
+        if (e.key === "Escape") { editInput.remove(); label.classList.toggle("hidden"); }
+    });
+
+    // 5. Also commit if user clicks somewhere else
+    editInput.addEventListener("blur", finishEditing);
 }
 
 if (todo) {
