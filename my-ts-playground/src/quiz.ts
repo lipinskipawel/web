@@ -38,11 +38,11 @@ function buildQuiz(wrapperDiv: HTMLDivElement, current: Question): void {
 	console.log("building quiz");
 	console.log(`Current question ${JSON.stringify(current)}`);
 	removeAllChilderns(wrapperDiv);
-	let title = document.createElement("div");
-	let answers = document.createElement("div");
+	let questionTitle = document.createElement("div");
+	let options = document.createElement("div");
 
-	title.textContent = current.question;
-	buildPossibleAnswer(answers, current.answers);
+	questionTitle.textContent = current.question;
+	buildPossibleAnswer(options, current.answers);
 
 	let next = document.createElement("button");
 	next.textContent = 'Next Question';
@@ -51,13 +51,13 @@ function buildQuiz(wrapperDiv: HTMLDivElement, current: Question): void {
 		questions
 	));
 
-	wrapperDiv.appendChild(title);
-	wrapperDiv.appendChild(answers);
+	wrapperDiv.appendChild(questionTitle);
+	wrapperDiv.appendChild(options);
 	wrapperDiv.appendChild(next);
 }
 
-function buildPossibleAnswer(answers: HTMLElement, allAnswers: string[]): void {
-	removeAllChilderns(answers);
+function buildPossibleAnswer(options: HTMLElement, allAnswers: string[]): void {
+	removeAllChilderns(options);
 	for (let an of allAnswers) {
 		let div = document.createElement("div");
 		let label = document.createElement("label");
@@ -69,7 +69,7 @@ function buildPossibleAnswer(answers: HTMLElement, allAnswers: string[]): void {
 		label.appendChild(document.createTextNode(an));
 
 		div.appendChild(label);
-		answers.appendChild(div);
+		options.appendChild(div);
 	}
 }
 
@@ -78,14 +78,21 @@ function nextQuestion(
 	questions: Question[]
 ): void {
 	console.log(`On click [next question]: currentCounter = ${currentQuestion}`);
+	examineAnswer();
+
+	let nextQuestion = questions[++currentQuestion];
+	if (!nextQuestion) {
+		console.log("This was last question");
+		scoreDisplay(mainDiv, questions);
+		return;
+	}
+	buildQuiz(mainDiv, nextQuestion);
+}
+
+function examineAnswer(): void {
 	let selected = document.querySelector<HTMLInputElement>('input[name="one-answer"]:checked');
 	if (!selected) {
 		console.log("nothing was selected");
-		return;
-	}
-	if (currentQuestion >= questions.length) {
-		console.log("End of questions");
-		scoreDisplay(mainDiv, questions);
 		return;
 	}
 	let label = selected.parentNode;
@@ -98,14 +105,6 @@ function nextQuestion(
 		console.log("Correct!!");
 		currentScore++;
 	}
-
-	let nextQuestion = questions[++currentQuestion];
-	if (!nextQuestion) {
-		console.log("This was last question");
-		scoreDisplay(mainDiv, questions);
-		return;
-	}
-	buildQuiz(mainDiv, nextQuestion);
 }
 
 function scoreDisplay(div: HTMLDivElement, quiz: Question[]): void {
