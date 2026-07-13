@@ -1,4 +1,5 @@
 import { removeAllChilderns, getTextFromTextNode } from './dom.ts';
+//import { startTimerForQuestion, stopTimerForQuestion } from './quiz-time.ts';
 import { getQuestions, type Question } from './quiz-questions.ts';
 // or do 2 lines of imports
 //import { getQuestions } from './quiz-questions.ts';
@@ -8,6 +9,8 @@ const quiz = document.getElementById("quiz");
 const questions = getQuestions();
 let currentQuestion: number = 0;
 let currentScore: number = 0;
+let intervalTimerIdPerQuestion: number = 0;
+let questionTime: number = 5 * 1000; // 5sec
 
 function startQuiz(event: PointerEvent): void {
 	// reset state
@@ -30,8 +33,8 @@ function startQuiz(event: PointerEvent): void {
 	}
 	buildQuiz(quizBox, current);
 
-	let button = event.target as HTMLButtonElement;
-	button.disabled = true;
+	let startQuizButton = event.target as HTMLButtonElement;
+	startQuizButton.disabled = true;
 }
 
 function buildQuiz(wrapperDiv: HTMLDivElement, current: Question): void {
@@ -50,10 +53,33 @@ function buildQuiz(wrapperDiv: HTMLDivElement, current: Question): void {
 		wrapperDiv,
 		questions
 	));
+	let timeLeftToAnswer = document.createElement("div");
+	startIntervalTimer(timeLeftToAnswer, wrapperDiv);
 
 	wrapperDiv.appendChild(questionTitle);
 	wrapperDiv.appendChild(options);
 	wrapperDiv.appendChild(next);
+	wrapperDiv.appendChild(timeLeftToAnswer);
+}
+
+function startIntervalTimer(timerDiv: Element, wrapperDiv: HTMLDivElement): void {
+	// reset state
+	questionTime = 5000;
+	intervalTimerIdPerQuestion = 0;
+
+	timerDiv.textContent = `Time to answer: ${questionTime}`;
+	intervalTimerIdPerQuestion = setInterval(timer, 1000, timerDiv, wrapperDiv);
+	console.log(`Starting the timer per question: ${intervalTimerIdPerQuestion}`);
+}
+
+function timer(div: HTMLDivElement, mainDiv: HTMLDivElement): void {
+	if (questionTime === 0) {
+		removeAllChilderns(div);
+		nextQuestion(mainDiv, questions);
+		return;
+	}
+	questionTime -= 1000;
+	div.textContent = `Time to answer: ${questionTime}`;
 }
 
 function buildPossibleAnswer(options: HTMLElement, allAnswers: string[]): void {
@@ -83,10 +109,20 @@ function nextQuestion(
 	let nextQuestion = questions[++currentQuestion];
 	if (!nextQuestion) {
 		console.log("This was last question");
+		clearIntervalTimer();
 		scoreDisplay(mainDiv, questions);
 		return;
 	}
+	clearIntervalTimer();
 	buildQuiz(mainDiv, nextQuestion);
+}
+
+function clearIntervalTimer(): void {
+	if (intervalTimerIdPerQuestion != 0) {
+		console.log(`Clearing the timer per question: ${intervalTimerIdPerQuestion}`);
+		clearInterval(intervalTimerIdPerQuestion);
+		intervalTimerIdPerQuestion = 0;
+	}
 }
 
 function examineAnswer(): void {
