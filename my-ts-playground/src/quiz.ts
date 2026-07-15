@@ -1,5 +1,5 @@
+import './quiz.css';
 import { removeAllChilderns, getTextFromTextNode } from './dom.ts';
-//import { startTimerForQuestion, stopTimerForQuestion } from './quiz-time.ts';
 import { getQuestions, type Question } from './quiz-questions.ts';
 // or do 2 lines of imports
 //import { getQuestions } from './quiz-questions.ts';
@@ -10,9 +10,35 @@ const questions = getQuestions();
 let currentQuestion: number = 0;
 let currentScore: number = 0;
 let intervalTimerIdPerQuestion: number = 0;
-let questionTime: number = 5 * 1000; // 5sec
+let questionTime: number = 5 * 1000;
 
-function startQuiz(event: PointerEvent): void {
+interface ScoreTable {
+	name: string,
+	score: number
+};
+let highScoreTable: ScoreTable[] = [];
+let name: string;
+
+//function startQuiz(event: PointerEvent): void {
+function startQuiz(): void {
+	let nameInput = document.getElementById("name-input") as HTMLInputElement;
+	if (nameInput) {
+		if (nameInput.value === '') {
+			//alert('Provide your name to start the quiz');
+			nameInput.classList.toggle("mark");
+			return;
+		}
+		name = nameInput.value;
+		nameInput.classList.toggle("hidden");
+	}
+
+	//let startQuizButton = event.target as HTMLButtonElement;
+	let startQuizButton = document.getElementById("start") as HTMLButtonElement;
+	if (!startQuizButton) {
+		return;
+	}
+	startQuizButton.disabled = true;
+
 	// reset state
 	currentScore = 0;
 	currentQuestion = 0;
@@ -32,9 +58,6 @@ function startQuiz(event: PointerEvent): void {
 		return;
 	}
 	buildQuiz(quizBox, current);
-
-	let startQuizButton = event.target as HTMLButtonElement;
-	startQuizButton.disabled = true;
 }
 
 function buildQuiz(wrapperDiv: HTMLDivElement, current: Question): void {
@@ -150,14 +173,52 @@ function scoreDisplay(div: HTMLDivElement, quiz: Question[]): void {
 	div.appendChild(h1);
 	let startQuiz = document.getElementById("start") as HTMLButtonElement;
 	startQuiz.disabled = false;
+	let nameInput = document.getElementById("name-input") as HTMLInputElement;
+	nameInput.classList.toggle("hidden");
+	nameInput.classList.remove("mark");
+	nameInput.value = '';
+
+	highScoreTable.push({
+		name: name,
+		score: currentScore
+	});
+	scoreTableDisplay(div);
+}
+
+function scoreTableDisplay(div: HTMLDivElement): void {
+	if (highScoreTable.length === 0) {
+		return;
+	}
+	let scoreTable = document.createElement("div");
+	let title = document.createElement("h1");
+	title.textContent = "High score";
+	highScoreTable.sort((a, b) => b.score - a.score);
+
+	let ul = document.createElement("ul");
+	for (let el of highScoreTable) {
+		let li = document.createElement("li");
+		li.textContent = `${el.name} with: ${el.score}`;
+		ul.appendChild(li);
+	}
+
+	scoreTable.appendChild(title);
+	scoreTable.appendChild(ul);
+	div.appendChild(scoreTable);
 }
 
 if (quiz) {
 	quiz.innerHTML = `
 		<h1>Hello in quiz game</h1>
 		<button id="start">Start Quiz</button>
+		<input id="name-input" type="text" placeholder="Your name"/>
 		<div id="quiz-box"></div>
 	`;
 
-	document.getElementById("start")?.addEventListener('click', (e) => startQuiz(e));
+	//document.getElementById("start")?.addEventListener('click', (e) => startQuiz(e));
+	document.getElementById("start")?.addEventListener('click', startQuiz);
+	document.getElementById("name-input")?.addEventListener('keypress', (e) => {
+		if (e.key == 'Enter') {
+			startQuiz();
+		}
+	});
 }

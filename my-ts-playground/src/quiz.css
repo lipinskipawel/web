@@ -1,0 +1,9 @@
+
+.hidden {
+	display: none;
+}
+
+.mark {
+	border: 2px solid red;
+	/*border-color: red;*/
+}
