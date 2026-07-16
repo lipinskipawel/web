@@ -1,5 +1,5 @@
 import './quiz.css';
-import { removeAllChilderns, getTextFromTextNode } from './dom.ts';
+import { removeAllChilderns } from './dom.ts';
 import { getQuestions, type Question } from './quiz-questions.ts';
 // or do 2 lines of imports
 //import { getQuestions } from './quiz-questions.ts';
@@ -91,7 +91,7 @@ function startIntervalTimer(timerDiv: Element, wrapperDiv: HTMLDivElement): void
 	intervalTimerIdPerQuestion = 0;
 
 	timerDiv.textContent = `Time to answer: ${questionTime}`;
-	intervalTimerIdPerQuestion = setInterval(timer, 1000, timerDiv, wrapperDiv);
+	intervalTimerIdPerQuestion = window.setInterval(timer, 1000, timerDiv, wrapperDiv);
 	console.log(`Starting the timer per question: ${intervalTimerIdPerQuestion}`);
 }
 
@@ -113,6 +113,7 @@ function buildPossibleAnswer(options: HTMLElement, allAnswers: string[]): void {
 		let radio = document.createElement("input");
 		radio.type = 'radio';
 		radio.name = 'one-answer';
+		radio.value = an;
 
 		label.appendChild(radio);
 		label.appendChild(document.createTextNode(an));
@@ -143,7 +144,7 @@ function nextQuestion(
 function clearIntervalTimer(): void {
 	if (intervalTimerIdPerQuestion != 0) {
 		console.log(`Clearing the timer per question: ${intervalTimerIdPerQuestion}`);
-		clearInterval(intervalTimerIdPerQuestion);
+		window.clearInterval(intervalTimerIdPerQuestion);
 		intervalTimerIdPerQuestion = 0;
 	}
 }
@@ -154,13 +155,11 @@ function examineAnswer(): void {
 		console.log("nothing was selected");
 		return;
 	}
-	let label = selected.parentNode;
-	let textNode = getTextFromTextNode(label);
 
 	let correctAnswer = questions[currentQuestion]!.correct;
-	console.log(`You selected -->${textNode}<--`);
+	console.log(`You selected -->${selected.value}<--`);
 	console.log(`Correct answer -->${correctAnswer}<--`);
-	if (correctAnswer === textNode) {
+	if (correctAnswer === selected.value) {
 		console.log("Correct!!");
 		currentScore++;
 	}
