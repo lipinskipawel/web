@@ -1,5 +1,18 @@
 import './expense.css';
 import { removeAllChilderns } from './dom.ts';
+import {
+  Chart,
+  LineController,
+  LineElement,
+  PointElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+  Title
+} from 'chart.js';
+
+Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend, Title);
 
 const expense = document.getElementById("expense");
 
@@ -10,7 +23,22 @@ interface Transaction {
 	amount: number
 }
 
-let transactions: Transaction[] = [];
+let transactions: Transaction[] = loadTransactions();
+let chartInstance: Chart | null = null;
+
+function loadTransactions(): Transaction[] {
+	let maybeTransactions = localStorage.getItem("transactions");
+	if (maybeTransactions) {
+		return JSON.parse(maybeTransactions);
+	} else {
+		return [];
+	}
+}
+
+function saveTransaction(txn: Transaction): void {
+	transactions.push(txn);
+	localStorage.setItem("transactions", JSON.stringify(transactions));
+}
 
 function addTransaction(event: KeyboardEvent, label: string): void {
 	if (event.key == 'Enter' && event.target instanceof HTMLInputElement) {
@@ -26,7 +54,7 @@ function addTransaction(event: KeyboardEvent, label: string): void {
 			transactionAmount.classList.add('mark');
 			return;
 		}
-		transactions.push({
+		saveTransaction({
 			name: transactionName?.value,
 			category: transactionCategory?.value,
 			date: transactionDate.value,
@@ -37,6 +65,7 @@ function addTransaction(event: KeyboardEvent, label: string): void {
 		updateBalance();
 		updateMonthlyStatement();
 		historyList(transactions);
+		drawTransactionChart(transactions);
 	}
 }
 
@@ -118,6 +147,8 @@ interface MonthlyTotal {
   year: number;
   month: number; // 1-12
   total: number;
+  income: number[];
+  expense: number[];
 }
 
 function groupByMonth(transactions: Transaction[]): MonthlyTotal[] {
@@ -130,14 +161,90 @@ function groupByMonth(transactions: Transaction[]): MonthlyTotal[] {
 		let key = `${year}-${month}`;
 
 		if (!map.has(key)) {
-			map.set(key, { year, month, total: 0 });
+			map.set(key, { year, month, total: 0, income: [], expense: [] });
 		}
-		map.get(key)!.total += amount;
+		let current = map.get(key);
+		current!.total += amount;
+		if (amount > 0) {
+			current!.income.push(amount);
+		} else {
+			current!.expense.push(amount);
+		}
 	}
 
 	return Array.from(map.values()).sort(
 		(a, b) => a.year - b.year || a.month - b.month
 	);
+}
+
+function drawTransactionChart(txns: Transaction[]): void {
+	const canvas = document.querySelector<HTMLCanvasElement>('#transaction-chart');
+	if (!canvas) { return; }
+	//canvas.width  = 300;
+	//canvas.height = 300;
+
+	const sumUpValues = (numbers: number[]) => {
+		return numbers.reduce((acc, curr) => acc + curr, 0);
+	}
+
+	const monthlyTotals = groupByMonth(txns);
+	const labels = monthlyTotals.map(m => `${m.year}-${String(m.month).padStart(2, '0')}`);
+	const balance = monthlyTotals.map(m => m.total);
+	const income = monthlyTotals.map(m => sumUpValues(m.income));
+	const expense = monthlyTotals.map(m => sumUpValues(m.expense));
+
+	if (chartInstance) {
+		chartInstance.data.labels = labels;
+		chartInstance.data.datasets[0].data = balance;
+		chartInstance.data.datasets[1].data = income;
+		chartInstance.data.datasets[2].data = expense;
+		chartInstance.update();
+		return;
+	}
+
+	const data: any = {
+		labels: labels,
+		datasets: [
+               {
+                   label: "Balance",
+                   data: balance,
+                   fill: false,
+                   borderColor: "rgb(75, 192, 192)",
+                   tension: 0.1,
+               },
+               {
+                   label: "Salary",
+                   data: income,
+                   fill: false,
+                   borderColor: "rgb(75, 0, 100)",
+                   tension: 0.1,
+               },
+               {
+                   label: "Expenses",
+                   data: expense,
+                   fill: false,
+                   borderColor: "rgb(150, 80, 20)",
+                   tension: 0.1,
+               }
+           ],
+	};
+	const config: any = {
+		type: 'line',
+		data: data,
+		options: {
+			responsive: false, // true will not respect the size
+			plugins: {
+				legend: {
+					position: 'top',
+				},
+				title: {
+					display: true,
+					text: 'Balance chart'
+				}
+			}
+		},
+	};
+	chartInstance = new Chart(canvas, config);
 }
 
 if (expense) {
@@ -187,8 +294,17 @@ if (expense) {
 	    <h3>Transaction history</h3>
 		<table id="transactions"></table>
 	  </div>
+
+	  <div id="history-map">
+	    <h3>Transaction chart</h3>
+		<canvas id="transaction-chart" width="300" height="300"></canvas>
+	  </div>
 	`;
 
 	document.getElementById("income-amount")?.addEventListener('keypress', (e) => addTransaction(e, "income"));
 	document.getElementById("expense-amount")?.addEventListener('keypress', (e) => addTransaction(e, "expense"));
+	updateBalance();
+	updateMonthlyStatement();
+	historyList(transactions);
+	drawTransactionChart(transactions);
 }
