@@ -1,5 +1,5 @@
 // import { type DatePair } from './weather-date.ts';
-import { startEndDate } from './weather-date.ts';
+import { fetchFor } from './clients/open-meteo.ts';
 import {
   Chart,
   LineController,
@@ -21,25 +21,9 @@ let chartInstance: Chart | null = null;
 
 async function searchCity(input: HTMLInputElement): Promise<void> {
 	const cityName = input.value;
-	const cityDetails = `https://geocoding-api.open-meteo.com/v1/search?name=${cityName}&count=1&language=en&format=json`;
-	const response = await window.fetch(cityDetails);
-	const body = await response.json();
-	console.log('Json', body);
-	const {latitude, longitude} = body.results[0];
 
-	const { startDate, endDate } = startEndDate(new Date(), 5);
-	const weatherData = `https://api.open-meteo.com/v1/forecast?
-		latitude=${latitude}
-	    &longitude=${longitude}
-	    &start_date=${startDate}
-	    &end_date=${endDate}
-		&hourly=temperature_2m`.replaceAll(' ', '')
-	;
-	console.log(`My query string: ${weatherData}`);
-	window.fetch(weatherData)
-		.then((res) => res.json())
+	fetchFor(cityName, 5)
 		.then((json) => {
-		    console.log('Weather data', json)
 			if (!isOpenMeteoWeather(json)) {
 				console.error(`Response is not OpenMeteoWeather`);
 				return;
@@ -123,6 +107,15 @@ function drawTemperatures(weatherData: OpenMeteoWeatherHourly): void {
                },
            ],
 	};
+
+	if (chartInstance) {
+		chartInstance.data.datasets[0].data = temperatures;
+		chartInstance.options!.plugins!.annotation!.annotations = nightAnnotations;
+		chartInstance.update();
+		return;
+	}
+
+
 	const config: any = {
 		type: 'line',
 		data: data,
@@ -167,7 +160,7 @@ function drawTemperatures(weatherData: OpenMeteoWeatherHourly): void {
 					annotations: nightAnnotations
 				},
 				interaction: {
-					mode: 'nearset',
+					mode: 'nearest',
 					intersect: false
 				}
 			}
