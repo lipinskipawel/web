@@ -1,5 +1,6 @@
 // import { type DatePair } from './weather-date.ts';
 import { fetchFor } from './clients/open-meteo.ts';
+import { removeAllChilderns } from './dom.ts';
 import {
   Chart,
   LineController,
@@ -19,9 +20,7 @@ Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearS
 
 let chartInstance: Chart | null = null;
 
-async function searchCity(input: HTMLInputElement): Promise<void> {
-	const cityName = input.value;
-
+async function searchCity(cityName: string): Promise<void> {
 	fetchFor(cityName, 5)
 		.then((json) => {
 			if (!isOpenMeteoWeather(json)) {
@@ -203,6 +202,33 @@ function addOneDay(dateStr: string): string {
 	return `${yyyy}-${mm}-${dd}`;
 }
 
+function historySearch(): void {
+	const maybeHistorySearch = localStorage.getItem('history-list');
+	if (!maybeHistorySearch) {
+		return;
+	}
+	const historySearch = JSON.parse(maybeHistorySearch);
+	const historyList = document.querySelector<HTMLDivElement>('#history-list');
+	if (!historyList) {
+		return;
+	}
+	removeAllChilderns(historyList);
+	for (let i in historySearch) {
+		let div = document.createElement('div');
+		div.textContent = historySearch[i];
+		div.addEventListener('click', (_) => { searchCity(div.textContent); })
+		historyList.appendChild(div);
+	}
+}
+
+function loadSearchHistory(): string[] {
+	const maybeHistory = localStorage.getItem('history-list');
+	if (!maybeHistory) {
+		return [];
+	}
+	return JSON.parse(maybeHistory);
+}
+
 const weather = document.getElementById("weather");
 
 if (weather) {
@@ -212,6 +238,11 @@ if (weather) {
 	  <div id='city-name'>
 	    <label for='city-name-input'>Enter city name</label>
 	    <input id='city-name-input' type='text' autofocus/>
+	  </div>
+
+	  <div id='search-history'>
+	    <h3>Search history</h3>
+		<div id='history-list'></div>
 	  </div>
 
 	  <div id="temperature-map">
@@ -226,8 +257,17 @@ if (weather) {
 	input?.addEventListener('keypress', (e) => {
 		if (e.key == 'Enter') {
 			const target = e.target as HTMLInputElement;
-			searchCity(target);
+			searchCity(target.value);
+			const history = loadSearchHistory();
+			if (history.find((e) => e === target.value)) {
+				historySearch();
+			} else {
+			    history.push(target.value);
+			    localStorage.setItem('history-list', JSON.stringify(history));
+	            historySearch();
+			}
 		}
 	});
+	historySearch();
 }
 
