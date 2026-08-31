@@ -1,5 +1,6 @@
 // import { type DatePair } from './weather-date.ts';
-import { fetchFor } from './clients/open-meteo.ts';
+import { type Geolocation, type OpenMeteoWeather, type OpenMeteoWeatherHourly } from './clients/open-meteo.ts';
+import { fetchGeolocationFor, fetchWeatherFor } from './clients/open-meteo.ts';
 import { removeAllChilderns } from './dom.ts';
 import {
   Chart,
@@ -21,62 +22,18 @@ Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearS
 let chartInstance: Chart | null = null;
 
 async function searchCity(cityName: string): Promise<void> {
-	fetchFor(cityName, 5)
-		.then((json) => {
-			if (!isOpenMeteoWeather(json)) {
-				console.error(`Response is not OpenMeteoWeather`);
-				return;
-			}
-			// json now is safely typed as OpenMeteoWeather
-			let rawHours = json.hourly;
-			drawTemperatures(rawHours);
-		});
-}
-
-interface OpenMeteoWeatherHourly {
-	temperature_2m: number[],
-	time: string[]
-}
-
-interface OpenMeteoWeather {
-	hourly: OpenMeteoWeatherHourly
+	try {
+		const geolocation: Geolocation = await fetchGeolocationFor(cityName);
+		const weatherResponse: OpenMeteoWeather = await fetchWeatherFor(geolocation, 5);
+		drawTemperatures(weatherResponse.hourly);
+	} catch (err) {
+		console.error(err);
+	}
 }
 
 interface ChartPoint {
   x: string;
   y: number;
-}
-
-// 'data is OpenMeteoWeather'
-// it is type predicate, it is normal boolean function in runtime
-// but TS uses the return type to narrow the type in whatever branch calls it
-function isOpenMeteoWeather(data: unknown): data is OpenMeteoWeather {
-	if (typeof data !== 'object' || data === null) {
-		return false;
-	}
-
-	const v = data as Record<string, unknown>;
-
-	if (typeof v.hourly === 'object') {
-		if (isOpenMeteoWeatherHourly(v.hourly)) {
-			return true;
-		}
-	}
-	return false;
-}
-
-function isOpenMeteoWeatherHourly(data: unknown): boolean {
-	if (typeof data !== 'object' || data === null) {
-		return false;
-	}
-
-	const v = data as Record<string, unknown>;
-
-	if (Array.isArray(v.temperature_2m) && Array.isArray(v.time)) {
-		return true;
-	}
-
-	return false;
 }
 
 function drawTemperatures(weatherData: OpenMeteoWeatherHourly): void {
