@@ -1,4 +1,3 @@
-// import { type DatePair } from './weather-date.ts';
 import { type Geolocation, type OpenMeteoWeather, type OpenMeteoWeatherHourly } from './clients/open-meteo.ts';
 import { fetchGeolocationFor, fetchWeatherFor } from './clients/open-meteo.ts';
 import { removeAllChilderns } from './dom.ts';
