@@ -23,10 +23,11 @@ function deleteTasks(): void {
 			}
 			let rawId = checkbox.id.replace("-inner-list", "");
 			if (checkbox.checked) {
-				let found = todos
-					.find(it => it.id === Number(rawId));
-				if (found) {
-					todos.splice(found?.id, 1);
+                // the index in the array is different than id of an object
+                // hence, we need index to remove it from array
+				let index = todos.findIndex(it => it.id === Number(rawId));
+				if (index !== -1) {
+					todos.splice(index, 1);
 				}
 			}
 		}
