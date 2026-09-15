@@ -1,3 +1,4 @@
+import { getItem, setItem } from './hooks/useLocalStorage.ts';
 import { type Geolocation, type OpenMeteoWeather, type OpenMeteoWeatherHourly } from './clients/open-meteo.ts';
 import { fetchGeolocationFor, fetchWeatherFor } from './clients/open-meteo.ts';
 import { removeAllChilderns } from './dom.ts';
@@ -159,11 +160,10 @@ function addOneDay(dateStr: string): string {
 }
 
 function historySearch(): void {
-	const maybeHistorySearch = localStorage.getItem('history-list');
-	if (!maybeHistorySearch) {
-		return;
-	}
-	const historySearch = JSON.parse(maybeHistorySearch);
+    const historySearch = getItem<string[]>('history-list')
+    if (!historySearch) {
+        return;
+    }
 	const historyList = document.querySelector<HTMLDivElement>('#history-list');
 	if (!historyList) {
 		return;
@@ -178,11 +178,7 @@ function historySearch(): void {
 }
 
 function loadSearchHistory(): string[] {
-	const maybeHistory = localStorage.getItem('history-list');
-	if (!maybeHistory) {
-		return [];
-	}
-	return JSON.parse(maybeHistory);
+    return getItem<Array<string>>('history-list') ?? [];
 }
 
 const weather = document.getElementById("weather");
@@ -219,7 +215,7 @@ if (weather) {
 				historySearch();
 			} else {
 			    history.push(target.value);
-			    localStorage.setItem('history-list', JSON.stringify(history));
+                setItem('history-list', history);
 	            historySearch();
 			}
 		}

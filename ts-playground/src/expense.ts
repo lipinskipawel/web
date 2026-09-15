@@ -1,5 +1,6 @@
 import './expense.css';
 import { removeAllChilderns } from './dom.ts';
+import { getItem, setItem } from './hooks/useLocalStorage.ts';
 import {
     Chart,
     LineController,
@@ -27,17 +28,12 @@ let transactions: Transaction[] = loadTransactions();
 let chartInstance: Chart | null = null;
 
 function loadTransactions(): Transaction[] {
-    let maybeTransactions = localStorage.getItem("transactions");
-    if (maybeTransactions) {
-        return JSON.parse(maybeTransactions);
-    } else {
-        return [];
-    }
+    return getItem<Transaction[]>('transactions') ?? [];
 }
 
 function saveTransaction(txn: Transaction): void {
     transactions.push(txn);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
+    setItem('transactions', transactions);
 }
 
 function addTransaction(event: KeyboardEvent, label: string): void {

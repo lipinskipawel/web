@@ -1,7 +1,8 @@
+import { getItem, setItem } from './hooks/useLocalStorage.ts';
 import "./todo.css";
 
 const todo = document.getElementById("todo");
-let todoCounter: number = Number(localStorage.getItem("todoCounter"));
+let todoCounter: number = getItem<number>('todoCounter') ?? 0;
 let hideShowToggle: boolean = false;
 
 interface Todo {
@@ -75,12 +76,12 @@ function taskReader(event: KeyboardEvent): void {
 
 function saveLoadLocalStorage(): void {
 	if (todos.length !== 0) {
-		localStorage.setItem("todos", JSON.stringify(todos));
-		localStorage.setItem("todoCounter", String(todoCounter));
+        setItem('todos', todos);
+        setItem('todoCounter', todoCounter);
 	} else {
-		let maybeTodos = localStorage.getItem("todos");
+		let maybeTodos = getItem<Todo[]>("todos");
 		if (maybeTodos) {
-			todos = JSON.parse(maybeTodos);
+			todos = maybeTodos;
 		}
 	}
 	renderList(hideShowToggle);

@@ -1,4 +1,5 @@
 import { add } from './math.ts';
+import { getItem, setItem } from './hooks/useLocalStorage.ts';
 
 let username: string = "John";
 let age : number = 21;
@@ -46,18 +47,18 @@ function reset(): void {
 }
 
 function storeClicks(): void {
-	localStorage.setItem("click", String(clicks));
+    setItem('click', clicks);
 }
 
 function getClicks(): void {
-	let fromLs = Number(localStorage.getItem("click"));
-	if (!Number.isNaN(fromLs)) {
-		clicks = fromLs;
-		const counter = document.querySelector("#counter");
-		if (counter) {
-			counter.textContent = `I will count button clicks ${clicks}`;
-		}
-	}
+    const stored = getItem<number>('click');
+    if (stored !== null && !Number.isNaN(stored)) {
+        clicks = stored; // reuse outer variable, no shadowing
+        const counter = document.querySelector("#counter");
+        if (counter) {
+            counter.textContent = `I will count button clicks ${clicks}`;
+        }
+    }
 }
 
 if (app) {
