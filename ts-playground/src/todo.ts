@@ -6,141 +6,141 @@ let todoCounter: number = getItem<number>('todoCounter') ?? 0;
 let hideShowToggle: boolean = false;
 
 interface Todo {
-	id: number,
-	task: string,
-	completed: boolean
+    id: number,
+    task: string,
+    completed: boolean
 }
 let todos: Todo[] = [];
 
 // function deleteTasks(event: PointerEvent): void {
 function deleteTasks(): void {
-	const listDiv = document.getElementById("list-div");
-	if (listDiv) {
-		let childrens = listDiv.childNodes;
-		for (let node of childrens) {
-			let checkbox = node.firstChild as HTMLInputElement;
-			if (!checkbox.checked) {
-				continue;
-			}
-			let rawId = checkbox.id.replace("-inner-list", "");
-			if (checkbox.checked) {
+    const listDiv = document.getElementById("list-div");
+    if (listDiv) {
+        let childrens = listDiv.childNodes;
+        for (let node of childrens) {
+            let checkbox = node.firstChild as HTMLInputElement;
+            if (!checkbox.checked) {
+                continue;
+            }
+            let rawId = checkbox.id.replace("-inner-list", "");
+            if (checkbox.checked) {
                 // the index in the array is different than id of an object
                 // hence, we need index to remove it from array
-				let index = todos.findIndex(it => it.id === Number(rawId));
-				if (index !== -1) {
-					todos.splice(index, 1);
-				}
-			}
-		}
-		renderList(hideShowToggle);
-	}
+                let index = todos.findIndex(it => it.id === Number(rawId));
+                if (index !== -1) {
+                    todos.splice(index, 1);
+                }
+            }
+        }
+        renderList(hideShowToggle);
+    }
 }
 
 function completeTasks(): void {
-	const listDiv = document.getElementById("list-div") as HTMLDivElement;
-	if (listDiv) {
-		let childrens = listDiv.children;
-		for (let child of childrens) {
-			let checkbox = child.querySelector<HTMLInputElement>("input");
-			if (checkbox) {
-				if (!checkbox.checked) {
-					continue;
-				}
-				let rawId = checkbox.id.replace("-inner-list", "");
-				let current = todos.find(it => it.id === Number(rawId));
-				if (current) {
-					current.completed = !current.completed;
-				}
-			}
-		}
-		renderList(hideShowToggle);
-	}
+    const listDiv = document.getElementById("list-div") as HTMLDivElement;
+    if (listDiv) {
+        let childrens = listDiv.children;
+        for (let child of childrens) {
+            let checkbox = child.querySelector<HTMLInputElement>("input");
+            if (checkbox) {
+                if (!checkbox.checked) {
+                    continue;
+                }
+                let rawId = checkbox.id.replace("-inner-list", "");
+                let current = todos.find(it => it.id === Number(rawId));
+                if (current) {
+                    current.completed = !current.completed;
+                }
+            }
+        }
+        renderList(hideShowToggle);
+    }
 }
 
 function hideShow(): void {
-	hideShowToggle = !hideShowToggle;
-	renderList(hideShowToggle);
+    hideShowToggle = !hideShowToggle;
+    renderList(hideShowToggle);
 }
 
 function taskReader(event: KeyboardEvent): void {
-	if (event.key == "Enter" && event.target instanceof HTMLInputElement) {
-		todos.push({
-			id: todoCounter++,
-			task: event.target.value,
-			completed: false
-		} as Todo);
-		event.target.value = "";
-		renderList(hideShowToggle);
-	}
+    if (event.key == "Enter" && event.target instanceof HTMLInputElement) {
+        todos.push({
+            id: todoCounter++,
+            task: event.target.value,
+            completed: false
+        } as Todo);
+        event.target.value = "";
+        renderList(hideShowToggle);
+    }
 }
 
 function saveLoadLocalStorage(): void {
-	if (todos.length !== 0) {
+    if (todos.length !== 0) {
         setItem('todos', todos);
         setItem('todoCounter', todoCounter);
-	} else {
-		let maybeTodos = getItem<Todo[]>("todos");
-		if (maybeTodos) {
-			todos = maybeTodos;
-		}
-	}
-	renderList(hideShowToggle);
+    } else {
+        let maybeTodos = getItem<Todo[]>("todos");
+        if (maybeTodos) {
+            todos = maybeTodos;
+        }
+    }
+    renderList(hideShowToggle);
 }
 
 function renderList(hideCompleted: boolean): void {
-	const listDiv = document.getElementById("list-div");
-	while (listDiv?.firstChild) {
-		listDiv.removeChild(listDiv.firstChild);
-	}
-	if (listDiv) {
-		// let is better over the var when using closure, because 'let' creates
-		// fresh bindings per iteration, whereas 'var' would share one variable
-		// across every iteration, so every closure would see last value
-		for (let todo of todos) {
-			console.log(`What is idx: ${JSON.stringify(todo, null, 4)}`);
-			const checkbox = Object.assign(document.createElement("input"), {
-				id: `${todo.id}-inner-list`,
-				type: 'checkbox',
-				checked: false
-			}) as HTMLInputElement;
-			const label = Object.assign(document.createElement("label"), {
-				// This is optional to comment it out when using dblclick as a event
-				//htmlFor: `${todo.id}-inner-list`,
-				id: `${todo.id}-inner-label`,
-				textContent: `${todo.task}`
-			}) as HTMLLabelElement;
+    const listDiv = document.getElementById("list-div");
+    while (listDiv?.firstChild) {
+        listDiv.removeChild(listDiv.firstChild);
+    }
+    if (listDiv) {
+        // let is better over the var when using closure, because 'let' creates
+        // fresh bindings per iteration, whereas 'var' would share one variable
+        // across every iteration, so every closure would see last value
+        for (let todo of todos) {
+            console.log(`What is idx: ${JSON.stringify(todo, null, 4)}`);
+            const checkbox = Object.assign(document.createElement("input"), {
+                id: `${todo.id}-inner-list`,
+                type: 'checkbox',
+                checked: false
+            }) as HTMLInputElement;
+            const label = Object.assign(document.createElement("label"), {
+                // This is optional to comment it out when using dblclick as a event
+                //htmlFor: `${todo.id}-inner-list`,
+                id: `${todo.id}-inner-label`,
+                textContent: `${todo.task}`
+            }) as HTMLLabelElement;
 
-			if (drawTodo(todo, hideCompleted)) {
-				const wrapperDiv = document.createElement("div");
-				wrapperDiv.appendChild(checkbox);
-				if (todo.completed) {
-					label.classList.toggle("complete");
-				}
-				wrapperDiv.appendChild(label);
-				listDiv.appendChild(wrapperDiv);
-				label.addEventListener("dblclick", () => startEditing(todo, label, wrapperDiv));
-			}
-		}
-	}
+            if (drawTodo(todo, hideCompleted)) {
+                const wrapperDiv = document.createElement("div");
+                wrapperDiv.appendChild(checkbox);
+                if (todo.completed) {
+                    label.classList.toggle("complete");
+                }
+                wrapperDiv.appendChild(label);
+                listDiv.appendChild(wrapperDiv);
+                label.addEventListener("dblclick", () => startEditing(todo, label, wrapperDiv));
+            }
+        }
+    }
 }
 
 function drawTodo(todo: Todo, toggle: boolean): boolean {
-	return toggle == false || !todo.completed;
+    return toggle == false || !todo.completed;
 }
 
 function startEditing(todo: Todo, label: HTMLLabelElement, div: HTMLDivElement): void {
-	if (todo.completed) {
-		return;
-	}
+    if (todo.completed) {
+        return;
+    }
     // 1. Create a temporary input pre-filled with current task text
     const editInput = document.createElement("input");
-	// TypeScript already ships overloaded signatures for createElement method
-	// so we can access properties by '.'
+    // TypeScript already ships overloaded signatures for createElement method
+    // so we can access properties by '.'
     editInput.type = "text";
     editInput.value = todo.task;
 
     // 2. Hide the label, insert the input in its place
-	label.classList.toggle("hidden");
+    label.classList.toggle("hidden");
     div.insertBefore(editInput, label);
     editInput.focus();
 
@@ -166,24 +166,24 @@ function startEditing(todo: Todo, label: HTMLLabelElement, div: HTMLDivElement):
 }
 
 if (todo) {
-	todo.innerHTML = `
-		<h1>Hello inside the TODO app</h1>
-		<div>Add you new tasks</div>
-		<input type="text" id="task-input"/>
-		<button id="save-load-ls">Save or load from local storage</button>
-		<button id="delete">Delete checked tasks</button>
-		<button id="complete">Complete checked tasks</button>
-		<button id="hide-show">Hide/Show completed tasks</button>
-		<span></span>
-		<div id="list-div"></div>
-	`;
+    todo.innerHTML = `
+    <h1>Hello inside the TODO app</h1>
+    <div>Add you new tasks</div>
+    <input type="text" id="task-input"/>
+    <button id="save-load-ls">Save or load from local storage</button>
+    <button id="delete">Delete checked tasks</button>
+    <button id="complete">Complete checked tasks</button>
+    <button id="hide-show">Hide/Show completed tasks</button>
+    <span></span>
+    <div id="list-div"></div>
+    `;
 
-	renderList(hideShowToggle);
-	document.getElementById("save-load-ls")?.addEventListener("click", saveLoadLocalStorage);
-	document.getElementById("delete")?.addEventListener("click", deleteTasks);
-	document.getElementById("complete")?.addEventListener("click", completeTasks);
-	document.getElementById("hide-show")?.addEventListener("click", hideShow);
-	document.getElementById("task-input")?.addEventListener("keypress", (event) => {
-		taskReader(event);
-	});
+    renderList(hideShowToggle);
+    document.getElementById("save-load-ls")?.addEventListener("click", saveLoadLocalStorage);
+    document.getElementById("delete")?.addEventListener("click", deleteTasks);
+    document.getElementById("complete")?.addEventListener("click", completeTasks);
+    document.getElementById("hide-show")?.addEventListener("click", hideShow);
+    document.getElementById("task-input")?.addEventListener("keypress", (event) => {
+        taskReader(event);
+    });
 }
