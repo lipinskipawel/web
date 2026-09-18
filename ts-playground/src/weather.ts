@@ -1,5 +1,6 @@
 import { getItem, setItem } from './hooks/useLocalStorage.ts';
 import { type Geolocation, type OpenMeteoWeather, type OpenMeteoWeatherHourly } from './clients/open-meteo.ts';
+import { getCity } from './clients/big-data-cloud.ts';
 import { fetchGeolocationFor, fetchWeatherFor } from './clients/open-meteo.ts';
 import { removeAllChilderns } from './dom.ts';
 import {
@@ -25,7 +26,7 @@ async function searchCity(cityName: string): Promise<void> {
     try {
         const geolocation: Geolocation = await fetchGeolocationFor(cityName);
         const weatherResponse: OpenMeteoWeather = await fetchWeatherFor(geolocation, 5);
-        drawTemperatures(weatherResponse.hourly);
+        drawTemperatures(weatherResponse.hourly, cityName);
     } catch (err) {
         console.error(err);
     }
@@ -36,7 +37,7 @@ interface ChartPoint {
     y: number;
 }
 
-function drawTemperatures(weatherData: OpenMeteoWeatherHourly): void {
+function drawTemperatures(weatherData: OpenMeteoWeatherHourly, cityName: string): void {
     const canvas = document.querySelector<HTMLCanvasElement>('#temperature-canvas');
     if (!canvas) {
         console.error('Not canvas found');
@@ -63,10 +64,12 @@ function drawTemperatures(weatherData: OpenMeteoWeatherHourly): void {
             },
         ],
     };
+    const chartTitle = `Temperature for ${cityName}`;
 
     if (chartInstance) {
         chartInstance.data.datasets[0].data = temperatures;
         chartInstance.options!.plugins!.annotation!.annotations = nightAnnotations;
+        chartInstance.options!.plugins!.title!.text = chartTitle;
         chartInstance.update();
         return;
     }
@@ -106,7 +109,7 @@ function drawTemperatures(weatherData: OpenMeteoWeatherHourly): void {
                 },
                 title: {
                     display: true,
-                    text: 'Temperature chart'
+                    text: chartTitle
                 },
                 tooltip: {
                     mode: 'nearest',
@@ -181,6 +184,27 @@ function loadSearchHistory(): string[] {
     return getItem<Array<string>>('history-list') ?? [];
 }
 
+function loadWeatherBasedOnGeolocation(): void {
+    if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(async pos => {
+            const cityName = await getCity({
+                latitude: pos.coords.latitude,
+                longitude: pos.coords.longitude
+            });
+            searchCity(cityName);
+
+            const history = loadSearchHistory();
+            if (history.find((e) => e === cityName)) {
+                historySearch();
+            } else {
+                history.push(cityName);
+                setItem('history-list', history);
+                historySearch();
+            }
+        })
+    }
+}
+
 const weather = document.getElementById("weather");
 
 if (weather) {
@@ -206,6 +230,7 @@ if (weather) {
     const input = document.getElementById("city-name-input");
     // input?.focus(); or this, instead of autofocus on HTML
 
+    loadWeatherBasedOnGeolocation();
     input?.addEventListener('keypress', (e) => {
         if (e.key == 'Enter') {
             const target = e.target as HTMLInputElement;

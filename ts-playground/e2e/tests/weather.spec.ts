@@ -4,6 +4,7 @@ import {
     mockSuccessfulWeatherApi,
     mockMalformedWeatherResponse,
 } from '../fixtures/mocks/weather-api.mock';
+import { mockSuccessfulReverseGeolocation } from '../fixtures/mocks/big-data-clode.mock.ts';
 
 async function searchFor(page: Page, city: string): Promise<void> {
     const input = page.locator('#city-name-input');
@@ -31,6 +32,23 @@ test.describe('Weather app', () => {
         expect(mock.geocodingRequestUrls[0]).toContain('name=Warsaw');
         expect(mock.weatherRequestUrls[0]).toContain('latitude=52.52');
         expect(mock.weatherRequestUrls[0]).toContain('longitude=13.405');
+    });
+
+    test('on load, uses geolocation to resolve a city and searches it automatically', async ({ page, context }) => {
+        await context.grantPermissions(['geolocation']);
+        await context.setGeolocation({ latitude: 52.52, longitude: 13.405 });
+
+        const geoMock = await mockSuccessfulReverseGeolocation(page);
+        const mock = await mockSuccessfulWeatherApi(page);
+
+        const weatherResponse = page.waitForResponse(WEATHER_PATTERN);
+        await page.goto('/weather.html');
+        await weatherResponse;
+
+        expect(geoMock.reverseGeocodeUrls).toHaveLength(1);
+        expect(mock.geocodingRequestUrls[0]).toContain('name=Warsaw');
+        await expect(page.locator('#history-list')).toHaveText('Warsaw');
+        await expect(page.locator('#temperature-canvas')).toBeVisible();
     });
 
     test('adds a searched city to history, and does not duplicate repeat searches', async ({ page }) => {
