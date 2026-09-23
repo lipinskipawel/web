@@ -1,0 +1,35 @@
+* {
+    margin: 0px;
+}
+
+nav {
+    background-color: rgb(153, 204, 255);
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+nav > ul {
+    justify-content: space-between; /* split space evently, and li takes as much space as each li is size of */
+    align-items: center;
+    display: flex;
+    gap: 16px;
+    width: 950px;
+    list-style: none;
+}
+
+nav > ul > li {
+    /* split space evenly, regardless of size of the li (going more) */
+    /* flex: 1; */
+    text-align: center;
+    padding: 5px;
+}
+
+nav > ul > li > a {
+    text-decoration: none;
+    color: white;
+}
+
+nav > ul > li:hover {
+    background-color: rgb(128, 128, 128);
+}
