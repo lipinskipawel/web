@@ -20,7 +20,7 @@ import annotationPlugin from 'chartjs-plugin-annotation';
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, TimeScale, Tooltip, Legend, Title, annotationPlugin);
 
-let chartInstance: Chart | null = null;
+let chartInstance: Chart<'line', ChartPoint[], string> | null = null;
 
 async function searchCity(cityName: string): Promise<void> {
     try {
