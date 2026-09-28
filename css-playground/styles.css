@@ -1,0 +1,42 @@
+#centering {
+    border: solid;
+}
+
+.group{
+    border: solid;
+    margin: 10px;
+}
+
+.centering-1 {
+    background-color: yellow;
+    height: 100px;
+
+    & > span,
+    & > a {
+        background-color: red;
+    }
+}
+
+.centering-2 {
+    background-color: yellow;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+
+    & > span,
+    & > a {
+        background-color: red;
+    }
+}
+
+.centering-3 {
+    background-color: yellow;
+    height: 100px;
+    text-align: center;
+
+    & > span,
+    & > a {
+        background-color: red;
+        display: block;
+    }
+}
