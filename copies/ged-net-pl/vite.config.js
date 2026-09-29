@@ -1,17 +1,19 @@
 import { defineConfig } from 'vite'
 import { resolve } from 'path'
 
+const root = import.meta.dirname;
+
 export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'index.html'),
-        firma: resolve(__dirname, 'firma.html'),
-        serwis: resolve(__dirname, 'serwis.html'),
-        umowy: resolve(__dirname, 'umowy.html'),
-        urzadzenia: resolve(__dirname, 'urzadzenia.html'),
-        uslugi: resolve(__dirname, 'uslugi.html'),
-        kontakt: resolve(__dirname, 'kontakt.html'),
+        main: resolve(root, 'index.html'),
+        firma: resolve(root, 'firma.html'),
+        serwis: resolve(root, 'serwis.html'),
+        umowy: resolve(root, 'umowy.html'),
+        urzadzenia: resolve(root, 'urzadzenia.html'),
+        uslugi: resolve(root, 'uslugi.html'),
+        kontakt: resolve(root, 'kontakt.html'),
       },
     },
   },
