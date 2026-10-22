@@ -86,3 +86,26 @@
         text-align: center;
     }
 }
+
+.block {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+}
+
+.font-normal {
+    font-size: 1rem;
+}
+
+.font-more {
+    font-size: 1.5rem;
+}
+
+.font-twice {
+    font-size: 2rem;
+}
+
+.font-huge {
+    font-size: 3rem;
+}
