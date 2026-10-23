@@ -1,0 +1,40 @@
+
+.grid {
+    display: grid;
+    grid-template-areas:
+      "text text"
+      "cert partners"
+      "printers printers";
+    gap: 0.5rem;
+    padding: 10px;
+
+    & > div {
+        color: black;
+        background-color: #dde6ee;
+    }
+
+    & > div.text {
+        grid-area: text;
+    }
+
+    & > div.cert {
+        grid-area: cert;
+        color: blue;
+    }
+
+    & > div.partners {
+        grid-area: partners;
+        color: blue;
+    }
+
+    & > div.printers {
+        grid-area: printers;
+        color: red;
+    }
+}
+
+/* To align image with text  */
+img {
+  vertical-align: middle;
+}
+
