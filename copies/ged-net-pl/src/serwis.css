@@ -1,0 +1,75 @@
+
+.grid {
+    display: grid;
+    grid-template-areas:
+      'text text'
+      'zap only-img'
+      'more-text more-text';
+    grid-template-columns: 1fr auto; /* auto means the width of the div/cell
+                                      will be as wide as the element inside
+                                      it + padding */
+    padding: 1rem; /* This is for the parrent */
+    gap: 1rem; /* This is for children gap */
+
+    & > div {
+        background-color: #dde6ee;
+    }
+
+    & .text {
+        grid-area: text;
+        display: flex;
+        flex-direction: row;
+    }
+
+    & .zap {
+        grid-area: zap;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        & > div {
+            color: blue;
+            font-size: 1.2rem;
+            padding: 0.3rem;
+        }
+    }
+
+    & .only-img {
+        grid-area: only-img;
+
+        & img {
+            display: block; /* this is only for correctness of css engine I assume */
+        }
+    }
+
+    & .more-text {
+        grid-area: more-text;
+    }
+}
+
+ul.check-list {
+    & li:before {
+        content: '\2713';
+        display: inline-block;
+        color: blue;
+        padding: 0 6px 0 0;
+    }
+
+    & li {
+        list-style-type: none;
+        font-size: 1em;
+        padding: 0.1rem;
+    }
+}
+
+.border {
+    border: 1px solid #006600;
+}
+
+.padding-medium {
+    padding: 1rem;
+}
+
+.padding-small {
+    padding: 0.5rem;
+}
