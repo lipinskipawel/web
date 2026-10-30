@@ -1,0 +1,45 @@
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.5rem;
+}
+
+.tile {
+    display: flex;
+    flex-direction: column;
+
+    background-color: #dee6ee;
+    border: 1px solid #006600;
+    padding: 0.5rem;
+
+    & p {
+        padding: 0.5rem;
+    }
+
+    & h2 {
+        color: blue;
+        padding: 1rem;
+    }
+
+    & li {
+        list-style-type: '\2713';
+        padding-inline-start: 0.75rem;
+    }
+
+    & li::marker {
+        color: blue;
+    }
+
+
+    & img {
+        align-self: center; /* Do not stretch the img, under the flex: flex-start */
+        max-width: 100%; /* Never be wider than my parent's content */
+        height: auto; /* Compute the height automatically, so on smaller screens 
+                        img keeps its aspect ratio */
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+}
+
