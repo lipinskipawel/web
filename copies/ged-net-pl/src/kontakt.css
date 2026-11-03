@@ -1,0 +1,49 @@
+
+.row {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.tile {
+    display: flex;
+    flex-direction: column;
+
+    background-color: #dee6ee;
+    border: 1px solid #006600;
+    padding: 0.5rem;
+
+    & h1 {
+        padding: 0.5rem;
+        color: blue;
+    }
+
+    & h2 {
+        padding: 0.5rem;
+        color: blue;
+    }
+
+    & .together {
+        padding: 0.5rem;
+    }
+
+    & h3 {
+        padding: 0.5rem;
+        color: blue;
+    }
+
+    & img {
+        padding: 0.5rem;
+        /* align-self: center; */
+    }
+
+    & iframe {
+        width: 100%;
+        padding: 0.5rem;
+    }
+}
+
+.full {
+    width: 100%;
+}
