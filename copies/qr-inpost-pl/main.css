@@ -1,0 +1,12 @@
+:root {
+    --content-bg: #d9d9d9;
+}
+
+header {
+    background-color: red;
+}
+
+footer {
+    color: white;
+    background-color: #4d4d4d; /* 595959 */
+}

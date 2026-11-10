@@ -1,0 +1,10 @@
+
+#content {
+    display: flex;
+    flex-direction: column;
+}
+
+.first {
+    background-color: var(--content-bg);
+}
+
