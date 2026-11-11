@@ -1,12 +1,90 @@
 :root {
     --content-bg: #d9d9d9;
+    --all-left-margin: 20%;
+    --small-font-size: 0.8rem;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
 }
 
 header {
-    background-color: red;
+    & a {
+        display: block;
+        width: fit-content;
+        margin-left: var(--all-left-margin);
+    }
+
+    & img {
+        display: block; /* removes the small gap under inline images */
+    }
 }
 
 footer {
     color: white;
-    background-color: #4d4d4d; /* 595959 */
+    background-color: #595959; /* 4d4d4d */
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.footer-container {
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin-left: var(--all-left-margin);
+}
+
+.top {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    /* align-items: center; /* align img and ul, vertically */
+
+    & ul {
+        display: flex;
+        flex-direction: row;
+        gap: 1rem; /* space between items, 20% will overflow the parent */
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    & a {
+        color: inherit;
+    }
+
+    & a:link {
+        text-decoration: inherit;
+    }
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+}
+
+.bottom-line-yellow {
+    border-bottom: 2px solid yellow;
+}
+
+.bottom-line-white {
+    border-bottom: 1px solid white;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.small-padding {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+}
+
+.small-font {
+    font-size: var(--small-font-size);
+}
+
+.float-right {
+    text-align: right;
 }

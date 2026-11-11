@@ -2,9 +2,14 @@
 #content {
     display: flex;
     flex-direction: column;
+
 }
 
 .first {
     background-color: var(--content-bg);
+    padding-left: var(--all-left-margin);
 }
 
+.second {
+    margin-left: var(--all-left-margin);
+}
