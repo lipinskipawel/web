@@ -1,0 +1,41 @@
+.receive-content-wrap {
+    margin-left: var(--big-margin);
+    margin-right: var(--big-margin);
+}
+
+.top-sign {
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+.steps {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem; /* 5% makes overflow of text */
+
+    & > * {
+        /* by default: auto */
+        /* auto will NOT allow the 'parent' to shrink to what you set */
+        /* which will cause visual bad effect */
+        /* min-width: 0; ensures that each element can shrink */
+        min-width: 0;
+    }
+}
+
+.pic-text {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    width: 20rem;
+
+    & > span {
+        padding-left: 5%;
+    }
+}
+
+.text {
+    /* height: 100%; */
+}

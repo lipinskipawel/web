@@ -1,6 +1,6 @@
 :root {
     --content-bg: #d9d9d9;
-    --all-left-margin: 20%;
+    --big-margin: 20%;
     --small-font-size: 0.8rem;
 }
 
@@ -15,7 +15,7 @@ header {
     & a {
         display: block;
         width: fit-content;
-        margin-left: var(--all-left-margin);
+        margin-left: var(--big-margin);
     }
 
     & img {
@@ -34,7 +34,7 @@ footer {
     display: flex;
     flex-direction: column;
     max-width: 900px;
-    margin-left: var(--all-left-margin);
+    margin-left: var(--big-margin);
 }
 
 .top {

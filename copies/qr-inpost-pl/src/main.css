@@ -7,9 +7,9 @@
 
 .first {
     background-color: var(--content-bg);
-    padding-left: var(--all-left-margin);
+    padding-left: var(--big-margin);
 }
 
 .second {
-    margin-left: var(--all-left-margin);
+    margin-left: var(--big-margin);
 }
