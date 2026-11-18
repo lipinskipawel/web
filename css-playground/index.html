@@ -77,6 +77,30 @@
         </div>
 
         <div id="break"></div>
+
+        <div class="block border">
+            <span class="text">Container below has fixed size</span>
+            <div class="row">
+                <div class="border fixed-size margin-small">
+                    This container is fixed size.
+                    And the text is overflowing with height.<br><br>
+                    <span>Lorem ipsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum.</span>
+                </div>
+                <div class="border min-size margin-small">
+                    This container has min size defined.
+                    And it expends with width and height to the size of parent container.<br><br>
+                    Also if there is div next to it, it then does NOT expand to the maximum.<br><br>
+                    So it takes all available space to it.<br><br>
+                    It just expand to contain the child text. hmmmm
+                    <span>Lorem ipsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum. Lorem impsum.</span>
+                </div>
+                <div class="border thin-long margin-small">
+                    50px
+                    500px
+                </div>
+            </div>
+        </div>
+
     </div>
   </body>
 </html>

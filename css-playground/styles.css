@@ -94,6 +94,38 @@
     text-align: center;
 }
 
+.text {
+    text-align: left;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+}
+
+.border {
+    border: 5px solid black;
+}
+
+.fixed-size {
+    width: 200px;
+    height: 200px;
+}
+
+.min-size {
+    min-width: 200px;
+    min-height: 200px;
+}
+
+.thin-long {
+    width: 50px;
+    height: 500px;
+}
+
+.margin-small {
+    margin: 2rem;
+}
+
 .font-normal {
     font-size: 1rem;
 }
