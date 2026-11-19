@@ -5,11 +5,11 @@
 
 }
 
-.first {
+#first {
     background-color: var(--content-bg);
     padding-left: var(--big-margin);
 }
 
-.second {
-    margin-left: var(--big-margin);
-}
+/* #second { */
+/*     margin-left: var(--big-margin); */
+/* } */

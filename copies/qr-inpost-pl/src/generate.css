@@ -1,0 +1,21 @@
+
+.container {
+    display: flex;
+    flex-direction: row;
+}
+
+#left {
+    border-right: 1px solid green;
+}
+
+p {
+    white-space: pre;
+}
+
+input[type='checkbox'] {
+    white-space: pre;
+}
+
+.green {
+    color: green;
+}
