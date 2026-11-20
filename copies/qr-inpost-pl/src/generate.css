@@ -1,21 +1,136 @@
+.generate-content-wrap {
+    margin-top: 5rem;
+    margin-bottom: 5rem;
+}
 
 .container {
     display: flex;
     flex-direction: row;
 }
 
+.sign {
+    font-size: 2rem;
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
 #left {
     border-right: 1px solid green;
+
+    & button {
+        cursor: pointer;
+    }
+}
+
+#right {
+    margin-left: 3rem;
+    /* max-width: 360px; */
+}
+
+.inline {
+
+    & * {
+        display: inline;
+    }
+
+    .right-bar-small {
+        width: 0px;
+        border-right: 1px solid gray;
+    }
+}
+
+.right-margin-small {
+    margin-right: var(--margin-small);
+}
+
+.left-margin-small {
+    margin-left: .8rem;
 }
 
 p {
-    white-space: pre;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 input[type='checkbox'] {
     white-space: pre;
 }
 
+.digits {
+    text-align: center;
+    letter-spacing: 5px;
+}
+
 .green {
     color: green;
+}
+
+.spread-line {
+    display: flex;
+    flex-direction: row;
+    gap: 0.2rem;
+    justify-content: space-between;
+}
+
+.line {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+    /* justify-content: space-around; */
+
+    & select {
+        width: 150px;
+        height: 60px;
+
+        & option {
+            text-align: center; /* this has not effect */
+        }
+    }
+
+    & input {
+        width: 100%;
+        height: 60px;
+    }
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.focus-border:focus {
+    border: 2px solid yellow;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+
+}
+.tooltiptext {
+    position: absolute; /* does not take real html space */
+    visibility: hidden;
+    z-index: 1;
+    margin-left: 1rem;
+    padding: 1rem;
+    background-color: gray;
+}
+
+/* this will make triangle */
+.tooltiptext::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    /* border: 12px solid transparent; */
+    /* border-right-color: #eee; */
+    border: 12px solid transparent;
+    border-right-color: gray;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
 }

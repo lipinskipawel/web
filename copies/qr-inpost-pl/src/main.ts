@@ -9,9 +9,6 @@ let state : userAction = 'receive'
 
 const main = document.getElementById('main');
 
-// maybe I should pass HTMLDivElement to the `generate` and `returns`
-// so the "components" can mutate the state directly on the parent div
-// and potentally register event listener
 function userActionClick(button: HTMLButtonElement): void {
     const selectedAction = button.id;
 
@@ -23,8 +20,8 @@ function userActionClick(button: HTMLButtonElement): void {
     if (state === selectedAction) {
         return;
     } else {
-        const firstDiv = document.querySelector('#first');
-        const secondDiv = document.querySelector('#second');
+        const firstDiv = document.querySelector<HTMLDivElement>('#first');
+        const secondDiv = document.querySelector<HTMLDivElement>('#second');
         if (!(firstDiv && secondDiv)) {
             console.error('can not find container');
             return;
@@ -32,8 +29,8 @@ function userActionClick(button: HTMLButtonElement): void {
         removeAllChilderns(firstDiv);
         removeAllChilderns(secondDiv);
 
-        firstDiv.innerHTML = generate(selectedAction);
-        secondDiv.innerHTML = returns(selectedAction);
+        generate(selectedAction, firstDiv);
+        returns(selectedAction, secondDiv);
 
         document.querySelectorAll<HTMLButtonElement>('button[switchable]')?.forEach(element => {
             element.addEventListener('click', (event) => {
@@ -48,19 +45,22 @@ function userActionClick(button: HTMLButtonElement): void {
 }
 
 if (main) {
-    const first = generate(state);
-    const second = returns(state);
-
     main.innerHTML = `
       <div id='content'>
-        <div id='first'>
-          ${first}
-        </div>
-        <div id='second'>
-          ${second}
-        </div>
+        <div id='first'></div>
+        <div id='second'></div>
       </div>
     `;
+
+    const first = document.getElementById('first');
+    const second = document.getElementById('second');
+
+    if (!(first && second)) {
+        throw new Error('can not find #first #second');
+    }
+
+    generate(state, first);
+    returns(state, second);
 
     document.querySelectorAll<HTMLButtonElement>('div button[switchable]')?.forEach(element => {
         element.addEventListener('click', (event) => {

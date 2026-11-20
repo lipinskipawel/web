@@ -2,7 +2,11 @@ import './returns.css';
 
 import { type userAction } from './helper.ts';
 
-export function returns(action: userAction): string {
+export function returns(action: userAction, container: HTMLElement): void {
+    container.innerHTML = getHTML(action);
+}
+
+export function getHTML(action: userAction): string {
     switch (action) {
         case 'receive':
             return `
