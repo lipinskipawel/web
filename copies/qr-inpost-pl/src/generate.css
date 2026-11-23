@@ -134,3 +134,8 @@ input[type='checkbox'] {
 .tooltip:hover .tooltiptext {
     visibility: visible;
 }
+
+.adjust-to-parent {
+    width: 100%;
+    height: auto;
+}

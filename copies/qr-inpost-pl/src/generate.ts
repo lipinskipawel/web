@@ -1,4 +1,6 @@
 import './generate.css';
+import { removeAllChilderns } from './utils.ts';
+import QRCode from 'qrcode';
 
 import { type userAction } from './helper.ts';
 
@@ -15,15 +17,36 @@ export function generate(action: userAction, container: HTMLElement): void {
     // so this is not constantly executed on each render
     generateQR.addEventListener('click', e => {
         console.log(e);
-        switch (action) {
-            case 'receive':
-                console.log('receive');
-                let what = new QRCode();
-                return;
-            case 'return':
-                console.log('return');
-                return;
+        let dataContainer = document.getElementById('data') as HTMLDivElement;
+        if (!dataContainer) {
+            console.error('no #data');
+            return;
         }
+        let canvas = document.createElement('canvas');
+        canvas.classList.add('adjust-to-parent');
+
+        let [data, ok] = (() => {
+            switch (action) {
+                case 'receive':
+                    return generateQrForReceive(dataContainer);
+                case 'return':
+                    return generateQrForReturn(dataContainer);
+            }
+        })();
+
+        const size = Math.min(dataContainer.clientWidth, dataContainer.clientHeight);
+
+        if (ok) {
+            removeAllChilderns(dataContainer);
+            dataContainer.appendChild(canvas);
+
+            QRCode.toCanvas(canvas, `${data}`, { width: size }, err => {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
+
     });
 
     const digitInputs = document.querySelectorAll<HTMLInputElement>('.digits');
@@ -42,6 +65,25 @@ export function generate(action: userAction, container: HTMLElement): void {
         });
     });
 }
+
+function generateQrForReceive(parent: HTMLDivElement): [string, boolean] {
+    const prefixPhone = parent.querySelector<HTMLSelectElement>('#prefix-phone')?.value;
+    const phone = parent.querySelector<HTMLInputElement>('#phone')?.value;
+    const code = parent.querySelector<HTMLInputElement>('#code')?.value;
+    if (!(prefixPhone && phone && code)) {
+        return [``, false];
+    }
+    return [`${prefixPhone}_${phone}_${code}`, true];
+}
+
+function generateQrForReturn(parent: HTMLDivElement): [string, boolean] {
+    const returnCode = parent.querySelector<HTMLInputElement>('#return-code')?.value;
+    if (!returnCode) {
+        return [``, false];
+    }
+    return [`${returnCode}`, true];
+}
+
 
 function getHtml(action: userAction): string {
     return baseHtml(dataDiv(action));
@@ -111,13 +153,13 @@ function receive(): string {
             </span>
           </div>
           <div class='line'>
-            <select>
+            <select id='prefix-phone'>
               <option value='PL'>(PL) +48</option>
               <option value='NL'>(NL) +31</option>
               <option value='BE'>(BE) +32</option>
               <option value='FR'>(FR) +33</option>
             </select>
-            <input type='text focus-border' class='digits' inputmode="numeric" pattern="[0-9]*" maxlength="13"/>
+            <input id='phone' type='text focus-border' class='digits' inputmode="numeric" pattern="[0-9]*" maxlength="13"/>
           </div>
           <div class='spread-line'>
             <span>Passcode for receive</span>
@@ -127,7 +169,7 @@ function receive(): string {
             </span>
           </div>
           <div class='line'>
-            <input type='text' class='digits' maxlength="6" placeholder="___ ___"/>
+            <input id='code' type='text' class='digits' maxlength="6" placeholder="___ ___"/>
           </div>
         </div>
     `;
@@ -144,7 +186,7 @@ function returns(): string {
             </span>
           </div>
           <div class='line'>
-            <input type='text' class='digits' maxlength="9" placeholder="___ ___ ___"/>
+            <input id='return-code' type='text' class='digits' maxlength="9" placeholder="___ ___ ___"/>
           </div>
         </div>
     `;
