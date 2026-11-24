@@ -27,6 +27,27 @@
     /* max-width: 360px; */
 }
 
+.top-button {
+    background-color: transparent;
+    font-size: 1.5rem;
+    border: none;
+}
+
+.top-button:hover {
+    background-color: yellow;
+}
+
+.yellow-bg {
+    background-color: yellow;
+}
+
+#generate-qr {
+    background-color: yellow;
+    border: none;
+    width: 100%;
+    height: 50px;
+}
+
 .inline {
 
     & * {
@@ -56,9 +77,16 @@ input[type='checkbox'] {
     white-space: pre;
 }
 
+.prefix-digits {
+    background-color: white;
+    text-align: center;
+    border: 2px solid transparent;
+}
+
 .digits {
     text-align: center;
     letter-spacing: 5px;
+    border: 2px solid transparent;
 }
 
 .green {
@@ -138,4 +166,24 @@ input[type='checkbox'] {
 .adjust-to-parent {
     width: 100%;
     height: auto;
+}
+
+.yellow-color {
+    color: yellow;
+}
+
+
+.yellow-underline {
+    color: black;
+    text-decoration: underline;
+    text-decoration-color: yellow;
+    text-decoration-thickness: 4px;
+}
+
+.yellow-underline:hover {
+    background-color: yellow;
+}
+
+.font-bold {
+    font-weight: bold;
 }

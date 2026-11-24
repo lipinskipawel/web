@@ -6,6 +6,13 @@ import { type userAction } from './helper.ts';
 
 export function generate(action: userAction, container: HTMLElement): void {
     container.innerHTML = getHtml(action);
+    const selectedButton = container.querySelector<HTMLButtonElement>(`#${action}`);
+    if (!selectedButton) {
+        console.error('no button');
+        return;
+    }
+
+    selectedButton.classList.toggle('yellow-bg');
 
     const generateQR = document.querySelector<HTMLButtonElement>('#generate-qr');
     if (!generateQR) {
@@ -94,11 +101,11 @@ function baseHtml(data: string): string {
         <div class='generate-content-wrap'>
           <div class='container'>
             <div id='left'>
-              <div class='sign'>Generate QR for</div>
+              <div class='sign font-bold'>Generate QR for</div>
               <div class='inline'>
-                <button id="receive" switchable class='right-margin-small'>receive</button>
+                <button id="receive" switchable class='right-margin-small top-button font-bold'>receive</button>
                 <div class='right-bar-small'></div>
-                <button id="return" switchable class='left-margin-small'>return</button>
+                <button id="return" switchable class='left-margin-small top-button font-bold'>return</button>
               </div>
               <p>
                 Lorem .psum dolor sit amet, consectetur adipiscing elit.
@@ -107,11 +114,11 @@ function baseHtml(data: string): string {
               <div id='data'>${data}</div>
               <label>
                 <input type='checkbox'>
-                  * Some very important information.<br>
+                  * Some very important <a class='yellow-underline'>information.</a><br>
                     Second line of it.
               </label>
               <p>
-                Even more detailed information
+                Even more <a href='http://google.com' class='yellow-underline'>detailed information.</a>
               </p>
               <button id='generate-qr'>Generate qr</button>
             </div>
@@ -146,14 +153,14 @@ function receive(): string {
     return `
         <div class='column'>
           <div class='spread-line'>
-            <span>Phone number</span>
+            <span class='font-bold'>Phone number<span class='yellow-color'>*</span></span>
             <span class='tooltip'>
               <img src='info.png'/>
               <span class='tooltiptext'>Some information</span>
             </span>
           </div>
           <div class='line'>
-            <select id='prefix-phone'>
+            <select id='prefix-phone' class='prefix-digits'>
               <option value='PL'>(PL) +48</option>
               <option value='NL'>(NL) +31</option>
               <option value='BE'>(BE) +32</option>
@@ -162,7 +169,7 @@ function receive(): string {
             <input id='phone' type='text focus-border' class='digits' inputmode="numeric" pattern="[0-9]*" maxlength="13"/>
           </div>
           <div class='spread-line'>
-            <span>Passcode for receive</span>
+            <span class='font-bold'>Passcode for receive<span class='yellow-color'>*</span></span>
             <span class='tooltip'>
               <img src='info.png'/>
               <span class='tooltiptext'>Some information</span>
@@ -179,7 +186,7 @@ function returns(): string {
     return `
         <div class='column'>
           <div class='spread-line'>
-            <span>Your passcode of return</span>
+            <span class='font-bold'>Your passcode of return<span class='yellow-color'>*</span></span>
             <span class='tooltip'>
               <img src='info.png'/>
               <span class='tooltiptext'>Some information</span>

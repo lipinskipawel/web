@@ -1,6 +1,8 @@
 .receive-content-wrap {
+    margin-top: 6rem;
     margin-left: var(--big-margin);
     margin-right: var(--big-margin);
+    margin-bottom: 4rem;
 }
 
 .top-sign {
